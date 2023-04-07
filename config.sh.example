@@ -1,0 +1,17 @@
+# List of DNS records to be checked and updated to point to the server's public IP address
+FQDNS=(
+  "example.com"
+  "media.example.com"
+  "drive.example.com"
+  "srv01.example.com"
+)
+
+# Format: "key:secret" Get from https://developer.godaddy.com/keys
+GODADDY_SSO=""
+
+# Get from the documentation page at https://ifttt.com/maker_webhooks
+# Format: https://maker.ifttt.com/trigger/{IFTTT_EVENT}/json/with/key/{IFTTT_KEY}
+IFTTT_KEY=""
+IFTTT_EVENT=""
+
+LOG_FILE="log.csv"
