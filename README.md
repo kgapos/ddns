@@ -20,5 +20,5 @@ Copy the `config.sh.example` into a new `config.sh` file and configure the follo
 Example crontab command that runs every 5 minutes:
 ```
 # m h dom mon dow command
-*/5 * * * * /path/to/godaddy_ddns/run_ddns.sh
+*/5 * * * * cd /path/to/ddns && ./run_ddns.sh
 ```
