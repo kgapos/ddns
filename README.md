@@ -12,7 +12,7 @@ Copy the `config.sh.example` into a new `config.sh` file and configure the follo
 
 > Note: For more information check [the IFTTT webhooks documentation](https://ifttt.com/maker_webhooks). The IFTTT webhooks API endpoint looks like this `https://maker.ifttt.com/trigger/{IFTTT_EVENT}/json/with/key/{IFTTT_KEY}`
 
-# Use
+# Usage
 * Run on-demand with `./run_ddns.sh`
 * Check the logs with `tail -f log.csv`
 * Schedule as a cronjob by adding a crontab command with `crontab -e`
