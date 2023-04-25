@@ -16,7 +16,10 @@ log_message() {
 }
 
 log_message "STARTED" "GoDaddy DDNS execution started"
-SERVER_IP=$(curl -s https://api.ipify.org)
+SERVER_IP=$(curl -sf https://api.ipify.org) || {
+    log_message "FAILED_SERVER_IP_CHECK" "Failed to get server's public IP"
+    exit 1
+}
 log_message "CHECKED_SERVER_IP" "Server's current public IP: $SERVER_IP"
 
 for FQDN in "${FQDNS[@]}"; do
