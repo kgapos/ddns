@@ -22,6 +22,11 @@ SERVER_IP=$(curl -sf https://api.ipify.org) || {
 }
 log_message "CHECKED_SERVER_IP" "Server's current public IP: $SERVER_IP"
 
+if ! [[ $SERVER_IP =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  log_message "INVALID_SERVER_IP" "Server's reported current public IP is invalid: $SERVER_IP"
+  exit 1
+fi
+
 for FQDN in "${FQDNS[@]}"; do
   DOMAIN="$(echo "$FQDN" | rev | cut -d. -f1-2 | rev)"
   SUBDOMAIN="$(echo "$FQDN" | cut -d. -f1)"
