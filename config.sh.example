@@ -1,6 +1,7 @@
 # List of DNS records to be checked and updated to point to the server's public IP address
+# For root A records, use '@'
 FQDNS=(
-  "example.com"
+  "@.example.com"
   "media.example.com"
   "drive.example.com"
   "srv01.example.com"
