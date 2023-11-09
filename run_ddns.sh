@@ -34,6 +34,11 @@ for FQDN in "${FQDNS[@]}"; do
     "https://api.godaddy.com/v1/domains/$DOMAIN/records/A/$SUBDOMAIN" | jq -r '.[].data')
   log_message "CHECKED_DOMAIN_IP" "Current GoDaddy IP for $FQDN: $DOMAIN_IP"
 
+  if ! [[ $DOMAIN_IP =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    log_message "INVALID_DOMAIN_IP" "Domain's reported current public IP is invalid: $DOMAIN_IP"
+    continue
+  fi
+
   if [ "$SERVER_IP" != "$DOMAIN_IP" ]; then
     # Send email notification through IFTTT webhook
     curl -s -X POST \
