@@ -30,7 +30,7 @@ fi
 for FQDN in "${FQDNS[@]}"; do
   DOMAIN_IP=$(
     aws route53 list-resource-record-sets \
-      --hosted-zone-id "$HOSTED_ZONE_ID" \
+      --hosted-zone-id "$AWS_HOSTED_ZONE_ID" \
       --query "ResourceRecordSets[?Type == 'A' && Name == '$FQDN.'].ResourceRecords[0].Value" \
       --output text
   )
@@ -62,7 +62,7 @@ for FQDN in "${FQDNS[@]}"; do
       }]
     }"
     aws route53 change-resource-record-sets \
-      --hosted-zone-id "$HOSTED_ZONE_ID" \
+      --hosted-zone-id "$AWS_HOSTED_ZONE_ID" \
       --change-batch "$CHANGE_BATCH"
     log_message "UPDATED_ROUTE53" "Updated $FQDN from $DOMAIN_IP to $SERVER_IP..."
   fi
