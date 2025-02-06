@@ -7,8 +7,9 @@ FQDNS=(
   "srv01.example.com"
 )
 
-# Format: "key:secret" Get from https://developer.godaddy.com/keys
-GODADDY_SSO=""
+# Configure your AWS CLI profile and hosted zone ID below
+AWS_PROFILE="your_aws_profile"
+AWS_HOSTED_ZONE_ID="Z096079620AHY28L12345"
 
 # Get from the documentation page at https://ifttt.com/maker_webhooks
 # Format: https://maker.ifttt.com/trigger/{IFTTT_EVENT}/json/with/key/{IFTTT_KEY}

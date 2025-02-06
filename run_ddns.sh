@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Stop the script if any command returns a non-zero exit code 
+# Stop the script if any command returns a non-zero exit code
 set -e
 
 # Configuration file
@@ -11,14 +11,14 @@ log_message() {
   TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
   EVENT="$1"
   MESSAGE="$2"
-  echo "$TIMESTAMP,$EVENT,$MESSAGE" >> "$LOG_FILE"
+  echo "$TIMESTAMP,$EVENT,$MESSAGE" >>"$LOG_FILE"
   echo "$TIMESTAMP,$EVENT,$MESSAGE"
 }
 
-log_message "STARTED" "GoDaddy DDNS execution started"
+log_message "STARTED" "Route53 DDNS execution started"
 SERVER_IP=$(curl -sf https://api.ipify.org) || {
-    log_message "FAILED_SERVER_IP_CHECK" "Failed to get server's public IP"
-    exit 1
+  log_message "FAILED_SERVER_IP_CHECK" "Failed to get server's public IP"
+  exit 1
 }
 log_message "CHECKED_SERVER_IP" "Server's current public IP: $SERVER_IP"
 
@@ -28,11 +28,14 @@ if ! [[ $SERVER_IP =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
 fi
 
 for FQDN in "${FQDNS[@]}"; do
-  DOMAIN="$(echo "$FQDN" | rev | cut -d. -f1-2 | rev)"
-  SUBDOMAIN="$(echo "$FQDN" | cut -d. -f1)"
-  DOMAIN_IP=$(curl -s -X GET -H "Authorization: sso-key $GODADDY_SSO" \
-    "https://api.godaddy.com/v1/domains/$DOMAIN/records/A/$SUBDOMAIN" | jq -r '.[].data')
-  log_message "CHECKED_DOMAIN_IP" "Current GoDaddy IP for $FQDN: $DOMAIN_IP"
+  DOMAIN_IP=$(
+    aws route53 list-resource-record-sets \
+      --hosted-zone-id "$HOSTED_ZONE_ID" \
+      --query "ResourceRecordSets[?Type == 'A' && Name == '$FQDN.'].ResourceRecords[0].Value" \
+      --output text \
+      --profile $AWS_PROFILE
+  )
+  log_message "CHECKED_DOMAIN_IP" "Current Route53 IP for $FQDN: $DOMAIN_IP"
 
   if ! [[ $DOMAIN_IP =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     log_message "INVALID_DOMAIN_IP" "Domain's reported current public IP is invalid: $DOMAIN_IP"
@@ -44,15 +47,26 @@ for FQDN in "${FQDNS[@]}"; do
     curl -s -X POST \
       -H "Content-Type: application/json" \
       -d "{\"message\": \"Updating $FQDN from $DOMAIN_IP to $SERVER_IP...\"}" \
-      "https://maker.ifttt.com/trigger/$IFTTT_EVENT/json/with/key/$IFTTT_KEY" > /dev/null
+      "https://maker.ifttt.com/trigger/$IFTTT_EVENT/json/with/key/$IFTTT_KEY" >/dev/null
     log_message "INVOKED_IFTTT_WEBHOOK" "Invoked IFTTT webhook to send email notification"
+
     # Update the A record
-    curl -s -X PUT \
-      -H "Authorization: sso-key $GODADDY_SSO" \
-      -H "Content-Type: application/json" \
-      -d "[{\"data\": \"$SERVER_IP\", \"ttl\": 600}]" \
-      "https://api.godaddy.com/v1/domains/$DOMAIN/records/A/$SUBDOMAIN"
-    log_message "UPDATED_GODADDY" "Updated $FQDN from $DOMAIN_IP to $SERVER_IP..."
+    CHANGE_BATCH="{
+      \"Changes\": [{
+        \"Action\": \"UPSERT\",
+        \"ResourceRecordSet\": {
+          \"Name\": \"$FQDN\",
+          \"Type\": \"A\",
+          \"TTL\": 600,
+          \"ResourceRecords\": [{\"Value\": \"$SERVER_IP\"}]
+        }
+      }]
+    }"
+    aws route53 change-resource-record-sets \
+      --hosted-zone-id "$HOSTED_ZONE_ID" \
+      --change-batch "$CHANGE_BATCH" \
+      --profile $AWS_PROFILE
+    log_message "UPDATED_ROUTE53" "Updated $FQDN from $DOMAIN_IP to $SERVER_IP..."
   fi
 done
-log_message "COMPLETED" "GoDaddy DDNS execution complete"
+log_message "COMPLETED" "Route53 DDNS execution complete"
