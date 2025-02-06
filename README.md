@@ -6,15 +6,18 @@ notification using an IFTTT webhook. The script is designed to be used in situat
 server or device has a dynamic public IP that may change periodically, and the DNS records need to
 be updated accordingly to maintain accessibility.
 
+# Prerequisites
+[AWS CLI](https://aws.amazon.com/cli/) installed and configured with the necessary permissions to 
+update Route53 records.
+
 # Setup
 Grant execute permissions with `sudo chmod +x run_ddns.sh`.
 
 Copy the `config.sh.example` into a new `config.sh` file and configure the following:
 1. FQDNS: The list of DNS records to be monitored and updated to the servers public IP
-2. AWS_PROFILE: Your AWS CLI profile name. For more information see https://aws.amazon.com/cli/
-3. AWS_HOSTED_ZONE_ID: The Route53 hosted zone ID for the domain you want to update
-4. IFTTT_KEY: Your IFTTT webhook key from https://ifttt.com/maker_webhooks
-5. IFTTT_EVENT: Your IFTTT event name, as specified when creating the webhook
+2. AWS_HOSTED_ZONE_ID: The Route53 hosted zone ID that contains the records you want to update
+3. IFTTT_KEY: Your IFTTT webhook key from https://ifttt.com/maker_webhooks
+4. IFTTT_EVENT: Your IFTTT event name, as specified when creating the webhook
 
 > Note: For more information check 
 > [the IFTTT webhooks documentation](https://ifttt.com/maker_webhooks). The IFTTT webhooks API

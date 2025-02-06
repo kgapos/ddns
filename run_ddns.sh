@@ -32,8 +32,7 @@ for FQDN in "${FQDNS[@]}"; do
     aws route53 list-resource-record-sets \
       --hosted-zone-id "$HOSTED_ZONE_ID" \
       --query "ResourceRecordSets[?Type == 'A' && Name == '$FQDN.'].ResourceRecords[0].Value" \
-      --output text \
-      --profile $AWS_PROFILE
+      --output text
   )
   log_message "CHECKED_DOMAIN_IP" "Current Route53 IP for $FQDN: $DOMAIN_IP"
 
@@ -64,8 +63,7 @@ for FQDN in "${FQDNS[@]}"; do
     }"
     aws route53 change-resource-record-sets \
       --hosted-zone-id "$HOSTED_ZONE_ID" \
-      --change-batch "$CHANGE_BATCH" \
-      --profile $AWS_PROFILE
+      --change-batch "$CHANGE_BATCH"
     log_message "UPDATED_ROUTE53" "Updated $FQDN from $DOMAIN_IP to $SERVER_IP..."
   fi
 done
