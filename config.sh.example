@@ -1,13 +1,12 @@
 # List of DNS records to be checked and updated to point to the server's public IP address
-# For root A records, use '@'
-FQDNS=(
-  "@.example.com"
-  "media.example.com"
-  "drive.example.com"
-  "srv01.example.com"
+declare -A FQDNS=(
+  ["media.example1.com"]="Z096079620AHY28L12345"
+  ["drive.example1.com"]="Z096079620AHY28L12345"
+  ["srv01.example1.com"]="Z096079620AHY28L12345"
+  ["print.example2.com"]="Z096079620AHY28L54321"
+  ["files.example2.com"]="Z096079620AHY28L54321"
+  ["claim.example2.com"]="Z096079620AHY28L54321"
 )
-
-AWS_HOSTED_ZONE_ID="Z096079620AHY28L12345"
 
 # Get from the documentation page at https://ifttt.com/maker_webhooks
 # Format: https://maker.ifttt.com/trigger/{IFTTT_EVENT}/json/with/key/{IFTTT_KEY}
