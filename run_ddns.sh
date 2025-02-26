@@ -27,7 +27,13 @@ if ! [[ $SERVER_IP =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
   exit 1
 fi
 
-for FQDN in "${FQDNS[@]}"; do
+for FQDN in "${!FQDNS[@]}"; do
+  AWS_HOSTED_ZONE_ID="${FQDNS[$FQDN]}"
+  if [ -z "$AWS_HOSTED_ZONE_ID" ]; then
+    log_message "MISSING_HOSTED_ZONE_ID" "Missing hosted zone ID for FQDN $FQDN and domain $domain"
+    continue
+  fi
+
   DOMAIN_IP=$(
     aws route53 list-resource-record-sets \
       --hosted-zone-id "$AWS_HOSTED_ZONE_ID" \
